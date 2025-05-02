@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">WeatherPants</string>
+    <string name="loading_weather">Loading weather...</string>
+    <string name="temperature_label">Current Temperature:</string>
+    <string name="pants_advice_label">Pants Advice:</string>
+    <string name="wear_pants">YES! Wear Pants!</string>
+    <string name="no_pants">NO! Enjoy the freedom!</string>
+    <string name="error_fetching_weather">Could not fetch weather data.</string>
+    <string name="api_key_missing">API Key Missing!</string>
+</resources>

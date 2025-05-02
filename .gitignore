@@ -1,0 +1,27 @@
+# Generated build files
+*.apk
+*.aab
+*.ap_
+*.a_
+
+# Built output directories
+/build
+/app/build
+
+# Local configuration files
+local.properties
+.gradle/
+*.iml
+.idea/
+*.keystore
+*.jks
+
+# Mac OS files
+.DS_Store
+
+# Log files
+*.log
+
+# Android Studio profiling data
+captures/
+*.hprof

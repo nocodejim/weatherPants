@@ -1,0 +1,83 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+
+android {
+    namespace 'com.example.weatherpants' // Important for resource linking
+    compileSdk 34 // Target Android API level for compilation (Android 14)
+
+    defaultConfig {
+        applicationId "com.example.weatherpants"
+        minSdk 24 // Minimum Android API level required to run (Android 7.0)
+        targetSdk 34 // Target Android API level the app is tested against
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // IMPORTANT: Add this placeholder for the API key
+        // We will load the actual key from local.properties (which is in .gitignore)
+        buildConfigField("String", "WEATHER_API_KEY", "\"YOUR_API_KEY_HERE\"")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false // Set to true for production builds to shrink code/resources
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // For release, you'd ideally load the key securely, maybe from CI/CD env vars
+            // buildConfigField("String", "WEATHER_API_KEY", "\"${System.env.WEATHER_API_KEY}\"")
+        }
+        debug {
+             // Debug builds can use the key from local.properties
+            // The line below ensures BuildConfig picks up the value from local.properties
+             buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY"))
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+         viewBinding true // Enables easier view access
+         buildConfig true // Enables access to BuildConfig fields like the API key
+    }
+}
+
+// Function to safely read API key from local.properties
+// Create a local.properties file in the project root (it's ignored by git)
+// Add the line: WEATHER_API_KEY="YOUR_ACTUAL_API_KEY"
+def getApiKey(String propertyName) {
+    Properties properties = new Properties()
+    def localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        properties.load(localPropertiesFile.newDataInputStream())
+        def apiKey = properties.getProperty(propertyName)
+        if (apiKey != null) {
+            return "\\"" + apiKey + "\\"" // Return quoted string for BuildConfig
+        }
+    }
+    // Return a default value or throw an error if the key is mandatory for debug builds
+    println("Warning: API Key not found in local.properties. Using default placeholder.")
+    return "\"DEFAULT_API_KEY_MISSING\""
+}
+
+
+dependencies {
+    // Core Android libraries
+    implementation 'androidx.core:core-ktx:1.13.1' // Kotlin extensions
+    implementation 'androidx.appcompat:appcompat:1.6.1' // Compatibility library
+    implementation 'com.google.android.material:material:1.12.0' // Material Design components
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4' // Layout manager
+
+    // Networking library (Volley is simple for basic requests)
+    implementation 'com.android.volley:volley:1.2.1'
+
+    // Testing libraries (Placeholders for good practice)
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
