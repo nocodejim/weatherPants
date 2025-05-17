@@ -17,24 +17,27 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        // We will load the actual key from local.properties (which is in .gitignore)
-        // The getApiKey function is defined below
-        buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY_PLACEHOLDER"))
+        // The getApiKey function (defined below) will provide the value.
+        // Pass the property name you expect in local.properties.
+        buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY"))
     }
 
     buildTypes {
         release {
             minifyEnabled false // Set to true for production builds to shrink code/resources
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // For release, you'd ideally load the key securely, maybe from CI/CD env vars
-            // buildConfigField("String", "WEATHER_API_KEY", "\"${System.env.WEATHER_API_KEY}\"")
-            // Or use the getApiKey function if you have a release local.properties or similar setup
-            // buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY_PLACEHOLDER"))
+            // For release, ensure your API key handling is secure.
+            // This will also use the getApiKey function. Ensure your release process
+            // makes the key available if local.properties isn't part of release builds.
+            buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY"))
         }
         debug {
-             // Debug builds can use the key from local.properties
-            // The line below ensures BuildConfig picks up the value from local.properties
-             buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY"))
+             // Debug builds will use the key from local.properties via getApiKey.
+             // The line in defaultConfig already covers this for debug builds,
+             // but explicitly adding it here is also fine if you have different
+             // debug-specific logic in the future. For now, it inherits.
+             // If you needed a different key or logic for debug, you'd override here.
+             // buildConfigField("String", "WEATHER_API_KEY", getApiKey("DEBUG_WEATHER_API_KEY"))
         }
     }
     compileOptions {
@@ -50,10 +53,41 @@ android {
     }
 } // End of android { ... } block
 
-// Temporarily simplified getApiKey function for initial wrapper generation
+// Function to safely read API key from local.properties
+// Ensure local.properties exists in the project root with:
+// WEATHER_API_KEY="YOUR_ACTUAL_OPENWEATHERMAP_API_KEY"
 def getApiKey(String propertyName) {
-    println("Simplified getApiKey called for property: " + propertyName + ". Returning hardcoded key for now.")
-    return "\"TEMP_HARDCODED_API_KEY_FOR_GRADLE_WRAPPER\"" // Return a hardcoded, quoted string
+    Properties properties = new Properties()
+    File localPropertiesFile = rootProject.file("local.properties") // Corrected to File type
+
+    if (localPropertiesFile.exists()) {
+        try {
+            // Use a try-with-resources statement for the InputStream
+            localPropertiesFile.withInputStream { stream ->
+                properties.load(stream)
+            }
+            def apiKey = properties.getProperty(propertyName)
+
+            if (apiKey != null && !apiKey.trim().isEmpty()) {
+                // Successfully read the API key
+                println("INFO: Using API Key for '" + propertyName + "' from local.properties.")
+                return "\\\"" + apiKey.trim() + "\\\"" // Return quoted string for BuildConfig
+            } else {
+                // API key for the given propertyName is null or empty in local.properties
+                println("WARNING: API Key for '" + propertyName + "' in local.properties is null or empty.")
+            }
+        } catch (Exception e) {
+            // Error reading the local.properties file
+            println("WARNING: Could not read local.properties file for API Key '" + propertyName + "'. Error: " + e.getMessage())
+        }
+    } else {
+        // local.properties file does not exist
+        println("WARNING: local.properties file not found in project root. Cannot read API Key '" + propertyName + "'.")
+    }
+
+    // Default placeholder if key is not found, empty, or file is missing/unreadable
+    println("WARNING: Using default placeholder for API Key '" + propertyName + "'. The app may not function correctly.")
+    return "\"DEFAULT_KEY_MISSING_OR_PROBLEMATIC\""
 }
 
 dependencies {

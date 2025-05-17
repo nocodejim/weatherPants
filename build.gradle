@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.3.2' // Example version, check latest stable
+        classpath 'com.android.tools.build:gradle:8.3.2' // Using AGP 8.3.2 for stability
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -14,12 +14,7 @@ buildscript {
     }
 }
 
-// allprojects {
-//     repositories {
-//         google()
-//         mavenCentral()
-//     }
-// }
+// NO allprojects block here, repositories are defined in settings.gradle
 
 task clean(type: Delete) {
     delete rootProject.buildDir
