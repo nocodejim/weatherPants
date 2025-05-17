@@ -1,3 +1,4 @@
+// app/build.gradle
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
@@ -16,9 +17,9 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        // IMPORTANT: Add this placeholder for the API key
         // We will load the actual key from local.properties (which is in .gitignore)
-        buildConfigField("String", "WEATHER_API_KEY", "\"YOUR_API_KEY_HERE\"")
+        // The getApiKey function is defined below
+        buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY_PLACEHOLDER"))
     }
 
     buildTypes {
@@ -27,6 +28,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // For release, you'd ideally load the key securely, maybe from CI/CD env vars
             // buildConfigField("String", "WEATHER_API_KEY", "\"${System.env.WEATHER_API_KEY}\"")
+            // Or use the getApiKey function if you have a release local.properties or similar setup
+            // buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY_PLACEHOLDER"))
         }
         debug {
              // Debug builds can use the key from local.properties
@@ -45,26 +48,13 @@ android {
          viewBinding true // Enables easier view access
          buildConfig true // Enables access to BuildConfig fields like the API key
     }
-}
+} // End of android { ... } block
 
-// Function to safely read API key from local.properties
-// Create a local.properties file in the project root (it's ignored by git)
-// Add the line: WEATHER_API_KEY="YOUR_ACTUAL_API_KEY"
+// Temporarily simplified getApiKey function for initial wrapper generation
 def getApiKey(String propertyName) {
-    Properties properties = new Properties()
-    def localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        properties.load(localPropertiesFile.newDataInputStream())
-        def apiKey = properties.getProperty(propertyName)
-        if (apiKey != null) {
-            return "\\"" + apiKey + "\\"" // Return quoted string for BuildConfig
-        }
-    }
-    // Return a default value or throw an error if the key is mandatory for debug builds
-    println("Warning: API Key not found in local.properties. Using default placeholder.")
-    return "\"DEFAULT_API_KEY_MISSING\""
+    println("Simplified getApiKey called for property: " + propertyName + ". Returning hardcoded key for now.")
+    return "\"TEMP_HARDCODED_API_KEY_FOR_GRADLE_WRAPPER\"" // Return a hardcoded, quoted string
 }
-
 
 dependencies {
     // Core Android libraries
