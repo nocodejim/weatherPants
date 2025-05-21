@@ -14,9 +14,10 @@ This document provides detailed instructions on how to set up, build, run, and u
 6. [Running the Application (Sideloading)](#running-the-application-sideloading)
 7. [Project Structure Explained](#project-structure-explained)
 8. [Code Overview](#code-overview)
-9. [Key Concepts Explained](#key-concepts-explained)
-10. [GitHub & DevOps Best Practices](#github--devops-best-practices)
-11. [Troubleshooting](#troubleshooting)
+9. [Replacing the Placeholder Weather Icon](#replacing-the-placeholder-weather-icon)
+10. [Key Concepts Explained](#key-concepts-explained)
+11. [GitHub & DevOps Best Practices](#github--devops-best-practices)
+12. [Troubleshooting](#troubleshooting)
 
 ## 1. Project Overview
 
@@ -147,7 +148,24 @@ Declares:
 * Activities
 * App metadata
 
-## 9. Key Concepts Explained
+## 9. Replacing the Placeholder Weather Icon
+
+A placeholder weather icon (`ic_placeholder_weather.xml`) has been added to the application. You can find this file in the `app/src/main/res/drawable/` directory.
+
+To replace this placeholder with your own custom icon:
+
+1.  **Add your custom icon file** to the `app/src/main/res/drawable/` directory. This could be a PNG file (e.g., `my_custom_icon.png`) or a Vector Drawable XML file (e.g., `my_custom_icon.xml`).
+2.  **Update the image source in the layout file:**
+    *   Open the `app/src/main/res/layout/activity_main.xml` file.
+    *   Locate the `ImageView` element with the ID `weatherIconImageView`.
+    *   Change the `android:src` attribute from `@drawable/ic_placeholder_weather` to reference your new icon file. For example, if your icon is named `my_custom_icon.png`, you would change it to `android:src="@drawable/my_custom_icon"`.
+
+**Icon Considerations:**
+
+*   **Dimensions:** Pay attention to the dimensions of your icon to ensure it fits well within the UI. The placeholder is 96dp x 96dp.
+*   **Scalability:** For better scalability across different screen densities, consider using vector drawables (.xml) instead of raster images (.png, .jpg).
+
+## 10. Key Concepts Explained
 
 ### Android SDK
 Collection of tools for Android development including libraries, build tools, and platform tools.
@@ -161,7 +179,7 @@ Android Package file format used for distributing and installing Android apps.
 ### View Binding
 Feature that provides type-safe access to UI elements, replacing findViewById().
 
-## 10. GitHub & DevOps Best Practices
+## 11. GitHub & DevOps Best Practices
 
 ### Branching Strategy
 * Use feature branches
@@ -179,7 +197,7 @@ Follow Conventional Commits:
 * Use local.properties for development
 * Use secure environment variables for CI/CD
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 Common issues and solutions:
 
