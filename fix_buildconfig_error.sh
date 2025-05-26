@@ -1,3 +1,17 @@
+#!/bin/bash
+
+echo "======================================================================"
+echo "Fixing BuildConfig API Key Generation Error"
+echo "======================================================================"
+
+# The error shows that the generated BuildConfig.java has:
+# public static final String WEATHER_API_KEY = \"3a7ab9b9e0fb8efbc4320ec5173d9ce1\";
+# The backslashes are being literally included, making invalid Java syntax.
+
+echo "1. Fixing the getApiKey function in app/build.gradle..."
+
+# Replace the entire app/build.gradle with the corrected version
+cat > app/build.gradle << 'EOF'
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
@@ -85,3 +99,37 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
+EOF
+
+echo "✓ Fixed app/build.gradle"
+
+# Clean and rebuild
+echo
+echo "2. Cleaning previous build artifacts..."
+docker run --rm -v "$(pwd):/app" -w /app weatherpants-dev-env ./gradlew clean
+
+echo
+echo "3. Testing the build with fixed API key handling..."
+docker run --rm -v "$(pwd):/app" -w /app weatherpants-dev-env ./scripts/build_apk.sh
+
+BUILD_EXIT_CODE=$?
+
+echo
+echo "======================================================================"
+if [ $BUILD_EXIT_CODE -eq 0 ]; then
+    echo "🎉 SUCCESS! Build completed with fixed API key handling!"
+    echo
+    if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+        echo "✅ APK created successfully:"
+        ls -lh app/build/outputs/apk/debug/app-debug.apk
+        echo
+        echo "Now you can sideload this working APK!"
+        echo "Command: adb install app/build/outputs/apk/debug/app-debug.apk"
+    fi
+else
+    echo "❌ Still failing. Checking what BuildConfig generates now..."
+    docker run --rm -v "$(pwd):/app" -w /app weatherpants-dev-env /bin/bash -c "
+        find app/build -name 'BuildConfig.java' -exec cat {} \; 2>/dev/null | head -20
+    "
+fi
+echo "======================================================================"
