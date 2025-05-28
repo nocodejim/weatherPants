@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Simple initial message
-        binding.messageTextView.text = "Welcome to WeatherPants!\n\nBasic app is working!"
+        // Simple test message
+        binding.messageTextView.text = "Simple MainActivity Test - Working!"
     }
 }
