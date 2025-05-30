@@ -7,6 +7,7 @@
     android:padding="16dp"
     tools:context=".MainActivity">
 
+    <!-- Placeholder for a general weather icon if desired, or remove if not used by final logic -->
     <ImageView
         android:id="@+id/weatherIconImageView"
         android:layout_width="96dp"
@@ -15,24 +16,51 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/messageTextView"
+        app:layout_constraintBottom_toTopOf="@id/temperatureTextView"
         app:layout_constraintVertical_chainStyle="packed"
         android:layout_marginTop="32dp"
-        android:layout_marginBottom="24dp"
-        android:contentDescription="Weather Icon" />
+        android:layout_marginBottom="16dp"
+        android:contentDescription="General Weather Icon" />
+
+    <TextView
+        android:id="@+id/temperatureTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        tools:text="72°F"
+        app:layout_constraintTop_toBottomOf="@id/weatherIconImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/messageTextView"
+        android:layout_marginBottom="16dp"/>
 
     <TextView
         android:id="@+id/messageTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Loading weather..."
+        tools:text="WeatherPants says: Wear Pants!"
         android:textSize="18sp"
         android:textAlignment="center"
         android:lineSpacingExtra="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/temperatureTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/weatherIconImageView"
-        app:layout_constraintWidth_default="spread" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/pantsIconImageView"
+        app:layout_constraintWidth_default="spread"
+        android:layout_marginBottom="24dp"/>
+
+    <ImageView
+        android:id="@+id/pantsIconImageView"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        tools:src="@drawable/ic_pants_emoji"
+        tools:visibility="visible"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/messageTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="Pants Indicator Icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
