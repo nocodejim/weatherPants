@@ -36,12 +36,14 @@ class MainActivity : AppCompatActivity() {
         if (apiKey.startsWith("\"") && apiKey.endsWith("\"") && apiKey.length > 1) {
             apiKey = apiKey.substring(1, apiKey.length - 1)
         }
+        Log.d("WeatherPantsLog", "apiKey after quote removal: '$apiKey'")
         if (apiKey == "DEFAULT_KEY_MISSING_OR_PROBLEMATIC" || apiKey.isEmpty()) {
             binding.temperatureTextView.text = "Error: API Key Missing. Please configure in local.properties."
             Log.w("WeatherPantsLog", "API Key is missing or problematic.")
             return
         }
 
+        Log.d("WeatherPantsLog", "apiKey before URL construction: '$apiKey'")
         val queue = Volley.newRequestQueue(this)
         val url = "$API_ENDPOINT?id=$CITY_ID&appid=$apiKey&units=imperial"
         Log.d("WeatherPantsLog", "Requesting URL: $url")
@@ -63,6 +65,15 @@ class MainActivity : AppCompatActivity() {
             },
             { error ->
                 Log.e("WeatherPantsLog", "Volley error: $error")
+                if (error.networkResponse != null) {
+                    Log.e("WeatherPantsLog", "Volley error status code: ${error.networkResponse.statusCode}")
+                    try {
+                        val body = String(error.networkResponse.data, Charsets.UTF_8)
+                        Log.e("WeatherPantsLog", "Volley error response body: $body")
+                    } catch (e: Exception) {
+                        Log.e("WeatherPantsLog", "Error parsing Volley error response body: $e")
+                    }
+                }
                 binding.temperatureTextView.text = "Error: Failed to fetch weather."
                 binding.messageTextView.text = "Please check connection or API key."
                 binding.pantsIconImageView.visibility = View.GONE
