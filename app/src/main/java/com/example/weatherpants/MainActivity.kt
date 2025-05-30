@@ -30,7 +30,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchWeatherData() {
-        val apiKey = BuildConfig.WEATHER_API_KEY
+        var apiKey = BuildConfig.WEATHER_API_KEY
+        // Defensive check: if the key from BuildConfig somehow ended up with quotes, remove them.
+        // This can happen if local.properties has WEATHER_API_KEY="yourkey"
+        if (apiKey.startsWith("\"") && apiKey.endsWith("\"") && apiKey.length > 1) {
+            apiKey = apiKey.substring(1, apiKey.length - 1)
+        }
         if (apiKey == "DEFAULT_KEY_MISSING_OR_PROBLEMATIC" || apiKey.isEmpty()) {
             binding.temperatureTextView.text = "Error: API Key Missing. Please configure in local.properties."
             Log.w("WeatherPantsLog", "API Key is missing or problematic.")
@@ -39,6 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         val queue = Volley.newRequestQueue(this)
         val url = "$API_ENDPOINT?id=$CITY_ID&appid=$apiKey&units=imperial"
+        Log.d("WeatherPantsLog", "Requesting URL: $url")
 
         val stringRequest = StringRequest(
             Request.Method.GET, url,
