@@ -1,0 +1,75 @@
+Project Root: /app
+Running Gradle clean...
+Downloading https://services.gradle.org/distributions/gradle-8.6-bin.zip
+............10%.............20%............30%.............40%.............50%............60%.............70%.............80%............90%.............100%
+
+Welcome to Gradle 8.6!
+
+Here are the highlights of this release:
+ - Configurable encryption key for configuration cache
+ - Build init improvements
+ - Build authoring improvements
+
+For more details see https://docs.gradle.org/8.6/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+
+> Configure project :app
+INFO: Using API Key for 'WEATHER_API_KEY' from local.properties. Processed key: 3a7ab9b9e0fb8efbc4320ec5173d9ce1
+INFO: Using API Key for 'WEATHER_API_KEY' from local.properties. Processed key: 3a7ab9b9e0fb8efbc4320ec5173d9ce1
+
+> Task :clean UP-TO-DATE
+> Task :app:clean
+
+BUILD SUCCESSFUL in 38s
+2 actionable tasks: 1 executed, 1 up-to-date
+Running Gradle assembleDebug...
+
+> Configure project :app
+INFO: Using API Key for 'WEATHER_API_KEY' from local.properties. Processed key: 3a7ab9b9e0fb8efbc4320ec5173d9ce1
+INFO: Using API Key for 'WEATHER_API_KEY' from local.properties. Processed key: 3a7ab9b9e0fb8efbc4320ec5173d9ce1
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:dataBindingMergeDependencyArtifactsDebug
+> Task :app:generateDebugResValues
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:generateDebugBuildConfig
+> Task :app:parseDebugLocalResources
+> Task :app:checkDebugAarMetadata
+> Task :app:mapDebugSourceSetPaths
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:mergeDebugResources
+> Task :app:processDebugMainManifest
+> Task :app:dataBindingGenBaseClassesDebug
+> Task :app:processDebugManifest
+> Task :app:javaPreCompileDebug
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :app:checkDebugDuplicateClasses
+> Task :app:desugarDebugFileDependencies
+> Task :app:mergeDebugJniLibFolders
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:mergeLibDexDebug
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:processDebugManifestForPackage
+> Task :app:mergeExtDexDebug
+> Task :app:processDebugResources
+
+> Task :app:compileDebugKotlin
+
+> Task :app:compileDebugKotlin FAILED
+30 actionable tasks: 30 executed
+--------------------------------------
+BUILD FAILED!
+Check the output above and the log file for errors: /app/build_log_20250530_145102.log
