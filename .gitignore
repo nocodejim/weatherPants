@@ -20,7 +20,7 @@ local.properties
 .DS_Store
 
 # Log files
-*.log
+build_log_2025052*.log
 
 # Android Studio profiling data
 captures/
