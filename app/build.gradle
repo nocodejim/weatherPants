@@ -50,13 +50,27 @@ def getApiKey(String propertyName) {
             localPropertiesFile.withInputStream { stream ->
                 properties.load(stream)
             }
-            def apiKey = properties.getProperty(propertyName)
+            def apiKeyProperty = properties.getProperty(propertyName)
 
+            if (apiKeyProperty != null) {
+                String trimmedKey = apiKeyProperty.trim()
+                // Strip surrounding quotes if present
+                if (trimmedKey.startsWith('"') && trimmedKey.endsWith('"') && trimmedKey.length() >= 2) {
+                    trimmedKey = trimmedKey.substring(1, trimmedKey.length() - 1)
+                }
+                
+                if (!trimmedKey.isEmpty()) {
+                    println("INFO: Using API Key for '" + propertyName + "' from local.properties. Processed key: " + trimmedKey)
+                    return '"' + trimmedKey + '"' // Ensure the final key is quoted for Java
+                } else {
+                    println("WARNING: API Key for '" + propertyName + "' in local.properties is empty after processing.")
+                }
             if (apiKey != null && !apiKey.trim().isEmpty()) {
                 println("INFO: Using API Key for '" + propertyName + "' from local.properties.")
                 return '"' + apiKey.trim() + '"'
+
             } else {
-                println("WARNING: API Key for '" + propertyName + "' in local.properties is null or empty.")
+                println("WARNING: API Key for '" + propertyName + "' not found in local.properties.")
             }
         } catch (Exception e) {
             println("WARNING: Could not read local.properties file for API Key '" + propertyName + "'. Error: " + e.getMessage())
@@ -65,8 +79,9 @@ def getApiKey(String propertyName) {
         println("WARNING: local.properties file not found in project root. Cannot read API Key '" + propertyName + "'.")
     }
 
-    println("WARNING: Using default placeholder for API Key '" + propertyName + "'.")
-    return '"DEFAULT_KEY_MISSING_OR_PROBLEMATIC"'
+
+    println("WARNING: Using default placeholder for API Key '" + propertyName + "'. The app may not function correctly.")
+    return '"DEFAULT_KEY_MISSING_OR_PROBLEMATIC"' // Default key, quoted for Java
 }
 
 dependencies {
