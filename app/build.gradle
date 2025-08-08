@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -15,8 +15,6 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        // Fixed API key handling - no extra escaping needed
         buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY"))
     }
 
@@ -26,20 +24,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY"))
         }
-        debug {
-            // Inherits from defaultConfig
-        }
     }
+    
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    
     buildFeatures {
-         viewBinding true
-         buildConfig true
+        viewBinding true
+        buildConfig true
     }
 }
 
@@ -67,6 +65,10 @@ def getApiKey(String propertyName) {
                 } else {
                     println("WARNING: API Key for '" + propertyName + "' in local.properties is empty after processing.")
                 }
+            if (apiKey != null && !apiKey.trim().isEmpty()) {
+                println("INFO: Using API Key for '" + propertyName + "' from local.properties.")
+                return '"' + apiKey.trim() + '"'
+
             } else {
                 println("WARNING: API Key for '" + propertyName + "' not found in local.properties.")
             }
@@ -77,6 +79,7 @@ def getApiKey(String propertyName) {
         println("WARNING: local.properties file not found in project root. Cannot read API Key '" + propertyName + "'.")
     }
 
+
     println("WARNING: Using default placeholder for API Key '" + propertyName + "'. The app may not function correctly.")
     return '"DEFAULT_KEY_MISSING_OR_PROBLEMATIC"' // Default key, quoted for Java
 }
@@ -86,7 +89,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
     implementation 'com.android.volley:volley:1.2.1'
 
     testImplementation 'junit:junit:4.13.2'
