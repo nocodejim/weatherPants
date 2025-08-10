@@ -20,9 +20,10 @@ local.properties
 .DS_Store
 
 # Log files
-build_log_2025052*.log
+build_log_*.log
 
 # Android Studio profiling data
 captures/
 *.hprof
 *.png
+output.txt

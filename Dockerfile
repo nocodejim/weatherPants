@@ -18,12 +18,12 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
 
 ENV ANDROID_SDK_ROOT=/opt/android-sdk
-ENV ANDROID_COMMAND_LINE_TOOLS_VERSION=13114758_latest  
-ENV ANDROID_BUILD_TOOLS_VERSION=34.0.0 
-ENV ANDROID_PLATFORM_VERSION=34 
+ENV ANDROID_COMMAND_LINE_TOOLS_VERSION=11076708
+ENV ANDROID_BUILD_TOOLS_VERSION=34.0.0
+ENV ANDROID_PLATFORM_VERSION=34
 
 RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
-    wget -q https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_COMMAND_LINE_TOOLS_VERSION}.zip -O /tmp/cmdline-tools.zip && \
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_COMMAND_LINE_TOOLS_VERSION}_latest.zip -O /tmp/cmdline-tools.zip && \
     unzip -q /tmp/cmdline-tools.zip -d ${ANDROID_SDK_ROOT}/cmdline-tools && \
     mv ${ANDROID_SDK_ROOT}/cmdline-tools/cmdline-tools ${ANDROID_SDK_ROOT}/cmdline-tools/latest && \
     rm /tmp/cmdline-tools.zip
@@ -36,15 +36,5 @@ RUN yes | sdkmanager --licenses > /dev/null || true && \
                "platform-tools"
 
 WORKDIR /app
-
-COPY gradlew .
-COPY gradle ./gradle
-RUN chmod +x ./gradlew
-
-COPY build.gradle .
-COPY settings.gradle .
-COPY app/build.gradle ./app/
-
-COPY . .
 
 CMD ["/bin/bash"]

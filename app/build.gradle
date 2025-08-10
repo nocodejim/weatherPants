@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-android'
 }
 
 android {
@@ -15,73 +15,44 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY"))
+
+        // Fixed API key handling
+        buildConfigField("String", "WEATHER_API_KEY", getApiKey())
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "WEATHER_API_KEY", getApiKey("WEATHER_API_KEY"))
         }
     }
-    
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    
     buildFeatures {
         viewBinding true
         buildConfig true
     }
 }
 
-def getApiKey(String propertyName) {
+// Simplified and fixed API key function
+def getApiKey() {
     Properties properties = new Properties()
     File localPropertiesFile = rootProject.file("local.properties")
-
+    
     if (localPropertiesFile.exists()) {
-        try {
-            localPropertiesFile.withInputStream { stream ->
-                properties.load(stream)
-            }
-            def apiKeyProperty = properties.getProperty(propertyName)
-
-            if (apiKeyProperty != null) {
-                String trimmedKey = apiKeyProperty.trim()
-                // Strip surrounding quotes if present
-                if (trimmedKey.startsWith('"') && trimmedKey.endsWith('"') && trimmedKey.length() >= 2) {
-                    trimmedKey = trimmedKey.substring(1, trimmedKey.length() - 1)
-                }
-                
-                if (!trimmedKey.isEmpty()) {
-                    println("INFO: Using API Key for '" + propertyName + "' from local.properties. Processed key: " + trimmedKey)
-                    return '"' + trimmedKey + '"' // Ensure the final key is quoted for Java
-                } else {
-                    println("WARNING: API Key for '" + propertyName + "' in local.properties is empty after processing.")
-                }
-            if (apiKey != null && !apiKey.trim().isEmpty()) {
-                println("INFO: Using API Key for '" + propertyName + "' from local.properties.")
-                return '"' + apiKey.trim() + '"'
-
-            } else {
-                println("WARNING: API Key for '" + propertyName + "' not found in local.properties.")
-            }
-        } catch (Exception e) {
-            println("WARNING: Could not read local.properties file for API Key '" + propertyName + "'. Error: " + e.getMessage())
+        properties.load(localPropertiesFile.newDataInputStream())
+        String apiKey = properties.getProperty("WEATHER_API_KEY", "")
+        if (!apiKey.isEmpty()) {
+            return apiKey
         }
-    } else {
-        println("WARNING: local.properties file not found in project root. Cannot read API Key '" + propertyName + "'.")
     }
-
-
-    println("WARNING: Using default placeholder for API Key '" + propertyName + "'. The app may not function correctly.")
-    return '"DEFAULT_KEY_MISSING_OR_PROBLEMATIC"' // Default key, quoted for Java
+    
+    return "\"YOUR_API_KEY_HERE\""
 }
 
 dependencies {
