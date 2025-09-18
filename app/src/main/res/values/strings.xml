@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">WeatherPants</string>
     <string name="loading_weather">Checking the weather…</string>
+    <string name="refreshing_weather">Refreshing weather…</string>
     <string name="temperature_label">Current Temperature:</string>
     <string name="pants_advice_label">Pants Recommendation</string>
     <string name="wear_pants">Wear Pants! 👖</string>
@@ -8,4 +9,6 @@
     <string name="error_fetching_weather">Oops! Weather data unavailable</string>
     <string name="api_key_missing">API Key Missing!</string>
     <string name="location_cincinnati">Cincinnati, OH</string>
+    <string name="refresh_weather">Refresh Weather</string>
+    <string name="weather_updated">Weather updated!</string>
 </resources>
