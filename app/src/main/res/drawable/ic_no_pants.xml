@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Shorts/summer icon -->
+    <path
+        android:fillColor="@color/sunset_orange"
+        android:pathData="M8,8C7.45,8 7,8.45 7,9V14C7,14.55 7.45,15 8,15H9V16C9,17.1 9.9,18 11,18H13C14.1,18 15,17.1 15,16V15H16C16.55,15 17,14.55 17,14V9C17,8.45 16.55,8 16,8H8Z"/>
+    
+    <!-- Belt -->
+    <path
+        android:fillColor="@color/text_primary"
+        android:pathData="M7,9H17V11H7V9Z"/>
+</vector>

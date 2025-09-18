@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Modern pants icon -->
+    <path
+        android:fillColor="@color/storm_gray"
+        android:pathData="M8,2C7.45,2 7,2.45 7,3V8C7,8.55 7.45,9 8,9H9V20C9,21.1 9.9,22 11,22H13C14.1,22 15,21.1 15,20V9H16C16.55,9 17,8.55 17,8V3C17,2.45 16.55,2 16,2H8Z"/>
+    
+    <!-- Belt -->
+    <path
+        android:fillColor="@color/text_primary"
+        android:pathData="M7,7H17V9H7V7Z"/>
+</vector>

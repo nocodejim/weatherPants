@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Sun rays -->
+    <path
+        android:fillColor="@color/sunset_orange"
+        android:pathData="M12,1L15.09,6.26L21,4L18.74,9.91L23,12L18.74,14.09L21,20L15.09,17.74L12,23L8.91,17.74L3,20L5.26,14.09L1,12L5.26,9.91L3,4L8.91,6.26L12,1Z"/>
+    
+    <!-- Sun center -->
+    <path
+        android:fillColor="@color/warm_gradient_start"
+        android:pathData="M12,7C9.24,7 7,9.24 7,12C7,14.76 9.24,17 12,17C14.76,17 17,14.76 17,12C17,9.24 14.76,7 12,7Z"/>
+</vector>

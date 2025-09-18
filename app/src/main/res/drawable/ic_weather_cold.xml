@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Snowflake -->
+    <path
+        android:fillColor="@color/sky_blue_primary"
+        android:pathData="M12,2L13.09,8.26L19,6L16.74,11.91L21,14L16.74,16.09L19,22L13.09,19.74L12,26L10.91,19.74L5,22L7.26,16.09L3,14L7.26,11.91L5,6L10.91,8.26L12,2Z"/>
+    
+    <!-- Cloud -->
+    <path
+        android:fillColor="@color/cloud_gray"
+        android:pathData="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14C0,17.31 2.69,20 6,20L19,20C21.76,20 24,17.76 24,15C24,12.36 21.95,10.22 19.35,10.04Z"/>
+</vector>

@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <!-- Weather App Color Palette -->
+    <color name="sky_blue_primary">#4FC3F7</color>
+    <color name="sky_blue_dark">#29B6F6</color>
+    <color name="sky_blue_light">#81D4FA</color>
+    
+    <color name="sunset_orange">#FF7043</color>
+    <color name="sunset_orange_dark">#F4511E</color>
+    
+    <color name="cloud_white">#FAFAFA</color>
+    <color name="cloud_gray">#ECEFF1</color>
+    <color name="storm_gray">#607D8B</color>
+    <color name="storm_dark">#455A64</color>
+    
+    <color name="warm_gradient_start">#FFB74D</color>
+    <color name="warm_gradient_end">#FF8A65</color>
+    <color name="cool_gradient_start">#64B5F6</color>
+    <color name="cool_gradient_end">#42A5F5</color>
+    
+    <color name="text_primary">#263238</color>
+    <color name="text_secondary">#546E7A</color>
+    <color name="text_on_primary">#FFFFFF</color>
+    
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color>
 </resources>

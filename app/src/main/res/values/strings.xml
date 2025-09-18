@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">WeatherPants</string>
-    <string name="loading_weather">Loading weather...</string>
+    <string name="loading_weather">Checking the weather…</string>
     <string name="temperature_label">Current Temperature:</string>
-    <string name="pants_advice_label">Pants Advice:</string>
-    <string name="wear_pants">YES! Wear Pants!</string>
-    <string name="no_pants">NO! Enjoy the freedom!</string>
-    <string name="error_fetching_weather">Could not fetch weather data.</string>
+    <string name="pants_advice_label">Pants Recommendation</string>
+    <string name="wear_pants">Wear Pants! 👖</string>
+    <string name="no_pants">Go Shorts! 🩳</string>
+    <string name="error_fetching_weather">Oops! Weather data unavailable</string>
     <string name="api_key_missing">API Key Missing!</string>
+    <string name="location_cincinnati">Cincinnati, OH</string>
 </resources>
