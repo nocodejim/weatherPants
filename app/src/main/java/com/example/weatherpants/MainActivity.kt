@@ -38,7 +38,13 @@ class MainActivity : AppCompatActivity() {
         // Initially hide the weather cards and show loading
         binding.weatherCard.visibility = View.GONE
         binding.adviceCard.visibility = View.GONE
+        binding.refreshButton.visibility = View.GONE
         binding.messageTextView.visibility = View.VISIBLE
+
+        // Set up refresh button click listener
+        binding.refreshButton.setOnClickListener {
+            refreshWeatherData()
+        }
 
         if (apiKey == "YOUR_API_KEY_HERE") {
             Log.e("WeatherPants", "API Key is missing! Please set it in local.properties.")
@@ -50,9 +56,18 @@ class MainActivity : AppCompatActivity() {
         fetchWeatherData()
     }
 
-    private fun fetchWeatherData() {
-        Log.i("WeatherPants", "Fetching weather data...")
-        binding.messageTextView.text = getString(R.string.loading_weather)
+    private fun fetchWeatherData(isRefresh: Boolean = false) {
+        Log.i("WeatherPants", if (isRefresh) "Refreshing weather data..." else "Fetching weather data...")
+        
+        if (isRefresh) {
+            binding.messageTextView.text = getString(R.string.refreshing_weather)
+            binding.messageTextView.visibility = View.VISIBLE
+            binding.refreshButton.visibility = View.GONE
+            // Add rotation animation to refresh button
+            animateRefreshButton()
+        } else {
+            binding.messageTextView.text = getString(R.string.loading_weather)
+        }
 
         val apiUrl = "https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey&units=$units"
 
@@ -67,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                     val tempFormat = DecimalFormat("#.#")
                     val tempText = "${tempFormat.format(temp)}°F"
                     
-                    decidePants(temp, tempText)
+                    decidePants(temp, tempText, isRefresh)
 
                 } catch (e: JSONException) {
                     Log.e("WeatherPants", "Error parsing JSON response", e)
@@ -83,7 +98,11 @@ class MainActivity : AppCompatActivity() {
         requestQueue.add(jsonObjectRequest)
     }
 
-    private fun decidePants(temperature: Double, tempText: String) {
+    private fun refreshWeatherData() {
+        fetchWeatherData(isRefresh = true)
+    }
+
+    private fun decidePants(temperature: Double, tempText: String, isRefresh: Boolean = false) {
         val shouldWearPants = temperature < pantsTemperatureThreshold
 
         // Update UI with weather data
@@ -107,15 +126,26 @@ class MainActivity : AppCompatActivity() {
 
         // Hide loading message and show weather cards with animation
         binding.messageTextView.visibility = View.GONE
-        showWeatherCardsWithAnimation()
+        
+        if (isRefresh) {
+            // For refresh, just show the refresh button and give feedback
+            binding.refreshButton.visibility = View.VISIBLE
+            Toast.makeText(this, getString(R.string.weather_updated), Toast.LENGTH_SHORT).show()
+            // Add a subtle pulse animation to indicate update
+            animateWeatherUpdate()
+        } else {
+            // For initial load, show full animation
+            showWeatherCardsWithAnimation()
+        }
         
         Log.i("WeatherPants", "Temperature: $temperature, Wear pants: $shouldWearPants")
     }
 
     private fun showWeatherCardsWithAnimation() {
-        // Show cards
+        // Show cards and refresh button
         binding.weatherCard.visibility = View.VISIBLE
         binding.adviceCard.visibility = View.VISIBLE
+        binding.refreshButton.visibility = View.VISIBLE
 
         // Animate weather card
         binding.weatherCard.alpha = 0f
@@ -143,6 +173,26 @@ class MainActivity : AppCompatActivity() {
             start()
         }
 
+        // Animate refresh button
+        binding.refreshButton.alpha = 0f
+        binding.refreshButton.scaleX = 0f
+        binding.refreshButton.scaleY = 0f
+        ObjectAnimator.ofFloat(binding.refreshButton, "alpha", 0f, 1f).apply {
+            duration = 400
+            startDelay = 800
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.refreshButton, "scaleX", 0f, 1f).apply {
+            duration = 400
+            startDelay = 800
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.refreshButton, "scaleY", 0f, 1f).apply {
+            duration = 400
+            startDelay = 800
+            start()
+        }
+
         // Animate weather icon rotation
         ObjectAnimator.ofFloat(binding.weatherIconImageView, "rotation", 0f, 360f).apply {
             duration = 1000
@@ -151,11 +201,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun animateRefreshButton() {
+        // Rotate the refresh button during refresh
+        ObjectAnimator.ofFloat(binding.refreshButton, "rotation", 0f, 360f).apply {
+            duration = 1000
+            repeatCount = ObjectAnimator.INFINITE
+            start()
+        }
+    }
+
+    private fun animateWeatherUpdate() {
+        // Pulse animation for temperature text to indicate update
+        ObjectAnimator.ofFloat(binding.temperatureTextView, "scaleX", 1f, 1.1f, 1f).apply {
+            duration = 300
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.temperatureTextView, "scaleY", 1f, 1.1f, 1f).apply {
+            duration = 300
+            start()
+        }
+        
+        // Stop any ongoing refresh button rotation
+        binding.refreshButton.clearAnimation()
+        binding.refreshButton.rotation = 0f
+    }
+
     private fun showError() {
         binding.messageTextView.text = getString(R.string.error_fetching_weather)
         binding.messageTextView.visibility = View.VISIBLE
         binding.weatherCard.visibility = View.GONE
         binding.adviceCard.visibility = View.GONE
+        binding.refreshButton.visibility = View.VISIBLE // Show refresh button on error
+        binding.refreshButton.clearAnimation()
+        binding.refreshButton.rotation = 0f
         Toast.makeText(this, getString(R.string.error_fetching_weather), Toast.LENGTH_SHORT).show()
     }
 }

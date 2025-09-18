@@ -142,6 +142,21 @@
 
     </androidx.cardview.widget.CardView>
 
+    <!-- Refresh Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/refreshButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/ic_refresh"
+        android:contentDescription="Refresh Weather"
+        app:backgroundTint="@color/sky_blue_primary"
+        app:tint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone" />
+
     <!-- Loading/Error Message (hidden by default) -->
     <TextView
         android:id="@+id/messageTextView"
