@@ -18,12 +18,27 @@ android {
 
         // Fixed API key handling
         buildConfigField("String", "WEATHER_API_KEY", getApiKey())
+
+
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('../release-key.keystore')
+            storePassword 'weatherpants123'
+            keyAlias 'weatherpants'
+            keyPassword 'weatherpants123'
+        }
     }
 
     buildTypes {
+        debug {
+            signingConfig signingConfigs.release
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -39,6 +54,21 @@ android {
     }
 }
 
+
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.android.volley:volley:1.2.1'
+
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
 // Simplified and fixed API key function
 def getApiKey() {
     Properties properties = new Properties()
@@ -48,21 +78,9 @@ def getApiKey() {
         properties.load(localPropertiesFile.newDataInputStream())
         String apiKey = properties.getProperty("WEATHER_API_KEY", "")
         if (!apiKey.isEmpty()) {
-            return apiKey
+            return "\"${apiKey}\""
         }
     }
     
     return "\"YOUR_API_KEY_HERE\""
-}
-
-dependencies {
-    implementation 'androidx.core:core-ktx:1.13.1'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.android.volley:volley:1.2.1'
-
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
