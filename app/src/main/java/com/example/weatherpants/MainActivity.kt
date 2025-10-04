@@ -1,6 +1,8 @@
 package com.example.weatherpants
 
 import android.animation.ObjectAnimator
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -26,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private val latitude = 39.43
     private val longitude = -84.21
     private val units = "imperial"
-    private val pantsTemperatureThreshold = 60.0
+    private var pantsTemperatureThreshold = 60.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +48,10 @@ class MainActivity : AppCompatActivity() {
             refreshWeatherData()
         }
 
+        binding.settingsButton.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+
         if (apiKey == "YOUR_API_KEY_HERE") {
             Log.e("WeatherPants", "API Key is missing! Please set it in local.properties.")
             binding.messageTextView.text = getString(R.string.api_key_missing)
@@ -53,7 +59,29 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        loadThreshold()
         fetchWeatherData()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadThreshold()
+        // Re-check weather advice with potentially new threshold
+        if (binding.temperatureTextView.text.isNotEmpty() && binding.temperatureTextView.text != "--°F") {
+            val tempString = binding.temperatureTextView.text.toString().replace("°F", "")
+            try {
+                val temp = tempString.toDouble()
+                decidePants(temp, binding.temperatureTextView.text.toString())
+            } catch (e: NumberFormatException) {
+                Log.e("WeatherPants", "Could not parse temperature from TextView", e)
+            }
+        }
+    }
+
+    private fun loadThreshold() {
+        val sharedPreferences = getSharedPreferences("WeatherPantsPrefs", Context.MODE_PRIVATE)
+        pantsTemperatureThreshold = sharedPreferences.getInt("pantsThreshold", 60).toDouble()
+        Log.d("WeatherPants", "Loaded threshold: $pantsTemperatureThreshold")
     }
 
     private fun fetchWeatherData(isRefresh: Boolean = false) {
