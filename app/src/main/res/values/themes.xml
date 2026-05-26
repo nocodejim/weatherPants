@@ -1,10 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.WeatherPants" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.WeatherPants" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/sky_blue_primary</item>
-        <item name="colorPrimaryVariant">@color/sky_blue_dark</item>
         <item name="colorOnPrimary">@color/text_on_primary</item>
         <item name="colorSecondary">@color/sunset_orange</item>
-        <item name="colorSecondaryVariant">@color/sunset_orange_dark</item>
         <item name="colorOnSecondary">@color/white</item>
         <item name="android:statusBarColor" tools:targetApi="l">@color/transparent</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>

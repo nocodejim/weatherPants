@@ -14,3 +14,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "WeatherPants"
 include ':app'
+include ':core'
+include ':automotive'

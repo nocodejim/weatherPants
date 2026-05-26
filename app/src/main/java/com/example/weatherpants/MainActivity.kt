@@ -1,32 +1,46 @@
 package com.example.weatherpants
 
 import android.animation.ObjectAnimator
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.example.weatherpants.core.data.WeatherRepository
+import com.example.weatherpants.core.data.WeatherRepositoryImpl
+import com.example.weatherpants.core.model.Location
+import com.example.weatherpants.core.model.Weather
 import com.example.weatherpants.databinding.ActivityMainBinding
-import org.json.JSONException
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val requestQueue: RequestQueue by lazy {
-        Volley.newRequestQueue(this.applicationContext)
-    }
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var viewModel: WeatherViewModel
 
     private val apiKey = BuildConfig.WEATHER_API_KEY
-    private val latitude = 39.43
-    private val longitude = -84.21
-    private val units = "imperial"
-    private val pantsTemperatureThreshold = 60.0
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            getLastKnownLocation()
+        } else {
+            useFallbackLocation()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,15 +49,24 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("WeatherPants", "MainActivity created.")
 
-        // Initially hide the weather cards and show loading
-        binding.weatherCard.visibility = View.GONE
-        binding.adviceCard.visibility = View.GONE
-        binding.refreshButton.visibility = View.GONE
-        binding.messageTextView.visibility = View.VISIBLE
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Set up refresh button click listener
+        val repository: WeatherRepository = WeatherRepositoryImpl(apiKey = apiKey)
+        val factory = WeatherViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, factory)[WeatherViewModel::class.java]
+
+        // Setup refresh button click listener
         binding.refreshButton.setOnClickListener {
-            refreshWeatherData()
+            checkLocationPermissionAndFetch()
+        }
+
+        // Setup lifecycle observer for UI state
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    renderUiState(state)
+                }
+            }
         }
 
         if (apiKey == "YOUR_API_KEY_HERE") {
@@ -53,62 +76,87 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        fetchWeatherData()
+        checkLocationPermissionAndFetch()
     }
 
-    private fun fetchWeatherData(isRefresh: Boolean = false) {
-        Log.i("WeatherPants", if (isRefresh) "Refreshing weather data..." else "Fetching weather data...")
-        
-        if (isRefresh) {
-            binding.messageTextView.text = getString(R.string.refreshing_weather)
-            binding.messageTextView.visibility = View.VISIBLE
-            binding.refreshButton.visibility = View.GONE
-            // Add rotation animation to refresh button
-            animateRefreshButton()
-        } else {
-            binding.messageTextView.text = getString(R.string.loading_weather)
+    private fun checkLocationPermissionAndFetch() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                getLastKnownLocation()
+            }
+            else -> {
+                requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+        }
+    }
+
+    private fun getLastKnownLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            useFallbackLocation()
+            return
         }
 
-        val apiUrl = "https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey&units=$units"
-
-        val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.GET, apiUrl, null,
-            { response ->
-                Log.d("WeatherPants", "API Response: ${response.toString()}")
-                try {
-                    val main = response.getJSONObject("main")
-                    val temp = main.getDouble("temp")
-
-                    val tempFormat = DecimalFormat("#.#")
-                    val tempText = "${tempFormat.format(temp)}°F"
-                    
-                    decidePants(temp, tempText, isRefresh)
-
-                } catch (e: JSONException) {
-                    Log.e("WeatherPants", "Error parsing JSON response", e)
-                    showError()
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: android.location.Location? ->
+                if (location != null) {
+                    val loc = Location(
+                        latitude = location.latitude,
+                        longitude = location.longitude,
+                        name = getString(R.string.current_location)
+                    )
+                    binding.locationTextView.text = loc.name
+                    viewModel.fetchWeather(loc)
+                } else {
+                    useFallbackLocation()
                 }
-            },
-            { error ->
-                Log.e("WeatherPants", "Volley Error: ${error.message}", error)
-                showError()
             }
+            .addOnFailureListener {
+                useFallbackLocation()
+            }
+    }
+
+    private fun useFallbackLocation() {
+        val fallback = Location(
+            latitude = 39.43,
+            longitude = -84.21,
+            name = getString(R.string.location_lebanon)
         )
-
-        requestQueue.add(jsonObjectRequest)
+        binding.locationTextView.text = fallback.name
+        viewModel.fetchWeather(fallback)
     }
 
-    private fun refreshWeatherData() {
-        fetchWeatherData(isRefresh = true)
+    private fun renderUiState(state: UiState) {
+        when (state) {
+            is UiState.Loading -> {
+                binding.weatherCard.visibility = View.GONE
+                binding.adviceCard.visibility = View.GONE
+                binding.refreshButton.visibility = View.GONE
+                binding.messageTextView.text = getString(R.string.loading_weather)
+                binding.messageTextView.visibility = View.VISIBLE
+            }
+            is UiState.Success -> {
+                binding.messageTextView.visibility = View.GONE
+                displayWeatherData(state.weather)
+            }
+            is UiState.Error -> {
+                showError(state.message)
+            }
+        }
     }
 
-    private fun decidePants(temperature: Double, tempText: String, isRefresh: Boolean = false) {
-        val shouldWearPants = temperature < pantsTemperatureThreshold
-
-        // Update UI with weather data
+    private fun displayWeatherData(weather: Weather) {
+        val tempFormat = DecimalFormat("#.#")
+        val tempText = "${tempFormat.format(weather.temperature)}°F"
         binding.temperatureTextView.text = tempText
-        
-        if (shouldWearPants) {
+
+        if (weather.isPantsWeather) {
             // Cold weather styling
             binding.rootLayout.background = ContextCompat.getDrawable(this, R.drawable.bg_gradient_cool)
             binding.weatherIconImageView.setImageResource(R.drawable.ic_weather_cold)
@@ -124,29 +172,15 @@ class MainActivity : AppCompatActivity() {
             binding.adviceTextView.setTextColor(ContextCompat.getColor(this, R.color.warm_gradient_start))
         }
 
-        // Hide loading message and show weather cards with animation
-        binding.messageTextView.visibility = View.GONE
-        
-        if (isRefresh) {
-            // For refresh, just show the refresh button and give feedback
-            binding.refreshButton.visibility = View.VISIBLE
-            Toast.makeText(this, getString(R.string.weather_updated), Toast.LENGTH_SHORT).show()
-            // Add a subtle pulse animation to indicate update
-            animateWeatherUpdate()
-        } else {
-            // For initial load, show full animation
-            showWeatherCardsWithAnimation()
-        }
-        
-        Log.i("WeatherPants", "Temperature: $temperature, Wear pants: $shouldWearPants")
-    }
-
-    private fun showWeatherCardsWithAnimation() {
-        // Show cards and refresh button
+        // Show cards and button
         binding.weatherCard.visibility = View.VISIBLE
         binding.adviceCard.visibility = View.VISIBLE
         binding.refreshButton.visibility = View.VISIBLE
 
+        showWeatherCardsWithAnimation()
+    }
+
+    private fun showWeatherCardsWithAnimation() {
         // Animate weather card
         binding.weatherCard.alpha = 0f
         binding.weatherCard.translationY = 100f
@@ -201,39 +235,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun animateRefreshButton() {
-        // Rotate the refresh button during refresh
-        ObjectAnimator.ofFloat(binding.refreshButton, "rotation", 0f, 360f).apply {
-            duration = 1000
-            repeatCount = ObjectAnimator.INFINITE
-            start()
-        }
-    }
-
-    private fun animateWeatherUpdate() {
-        // Pulse animation for temperature text to indicate update
-        ObjectAnimator.ofFloat(binding.temperatureTextView, "scaleX", 1f, 1.1f, 1f).apply {
-            duration = 300
-            start()
-        }
-        ObjectAnimator.ofFloat(binding.temperatureTextView, "scaleY", 1f, 1.1f, 1f).apply {
-            duration = 300
-            start()
-        }
-        
-        // Stop any ongoing refresh button rotation
-        binding.refreshButton.clearAnimation()
-        binding.refreshButton.rotation = 0f
-    }
-
-    private fun showError() {
+    private fun showError(message: String) {
+        Log.e("WeatherPants", "Error: $message")
         binding.messageTextView.text = getString(R.string.error_fetching_weather)
         binding.messageTextView.visibility = View.VISIBLE
         binding.weatherCard.visibility = View.GONE
         binding.adviceCard.visibility = View.GONE
-        binding.refreshButton.visibility = View.VISIBLE // Show refresh button on error
-        binding.refreshButton.clearAnimation()
-        binding.refreshButton.rotation = 0f
+        binding.refreshButton.visibility = View.VISIBLE
         Toast.makeText(this, getString(R.string.error_fetching_weather), Toast.LENGTH_SHORT).show()
     }
 }

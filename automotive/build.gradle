@@ -1,0 +1,60 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
+
+android {
+    namespace 'com.example.weatherpants.automotive'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 24
+        targetSdk 34
+        
+        buildConfigField("String", "WEATHER_API_KEY", getApiKey())
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+}
+
+def getApiKey() {
+    Properties properties = new Properties()
+    File localPropertiesFile = rootProject.file("local.properties")
+    
+    if (localPropertiesFile.exists()) {
+        properties.load(localPropertiesFile.newDataInputStream())
+        String apiKey = properties.getProperty("WEATHER_API_KEY", "")
+        if (!apiKey.isEmpty()) {
+            return "\"${apiKey}\""
+        }
+    }
+    
+    return "\"YOUR_API_KEY_HERE\""
+}
+
+dependencies {
+    implementation project(':core')
+
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    
+    // Android Car App Library
+    implementation 'androidx.car.app:app:1.4.0'
+    
+    // Fused Location Provider (for location tracking on car screen)
+    implementation 'com.google.android.gms:play-services-location:21.2.0'
+
+    // Lifecycle Utilities
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+}

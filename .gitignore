@@ -5,8 +5,9 @@
 *.a_
 
 # Built output directories
-/build
-/app/build
+build/
+**/build/
+
 
 # Local configuration files
 local.properties
@@ -25,5 +26,9 @@ build_log_*.log
 # Android Studio profiling data
 captures/
 *.hprof
-*.png
-output.txt
+
+# Diagnostic logs and dumps
+debug_*.txt
+package_dump.txt
+fresh_package_dump.txt
+
